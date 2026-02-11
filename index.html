@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HIRAYA Telemetry System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* --- GLOBAL THEME --- */
+      body {
+        background-color: #020617; /* Slate 950 */
+        /* Subtle Grid Pattern */
+        background-image: 
+          radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 60%),
+          linear-gradient(0deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 100% 100%, 40px 40px, 40px 40px;
+        background-position: center;
+        background-attachment: fixed;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155; 
+        border-radius: 0px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b; 
+      }
+      
+      /* --- UTILITIES --- */
+      .font-space { font-family: 'Orbitron', sans-serif; }
+      .font-tech { font-family: 'Rajdhani', sans-serif; }
+      .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+      /* Tech Border Effect */
+      .tech-border {
+        position: relative;
+        background: rgba(15, 23, 42, 0.7); /* Slate 900 / 70% */
+        border: 1px solid rgba(51, 65, 85, 0.5); /* Slate 700 / 50% */
+        backdrop-filter: blur(8px);
+      }
+      
+      /* Corner Accents */
+      .tech-border::before {
+        content: '';
+        position: absolute;
+        top: -1px; left: -1px;
+        width: 12px; height: 12px;
+        border-top: 2px solid rgba(94, 234, 212, 0.5); /* Teal 300 */
+        border-left: 2px solid rgba(94, 234, 212, 0.5);
+        pointer-events: none;
+        z-index: 10;
+      }
+      .tech-border::after {
+        content: '';
+        position: absolute;
+        bottom: -1px; right: -1px;
+        width: 12px; height: 12px;
+        border-bottom: 2px solid rgba(94, 234, 212, 0.5);
+        border-right: 2px solid rgba(94, 234, 212, 0.5);
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      /* Angled Shapes */
+      .clip-corner-br {
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+      }
+      .clip-corner-tl {
+        clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
+      }
+      .clip-hex {
+        clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+      }
+
+      /* Serial Monitor Highlight Animation */
+      @keyframes highlight-fade {
+        0% { background-color: rgba(16, 185, 129, 0.2); }
+        100% { background-color: transparent; }
+      }
+      .new-line-flash {
+        animation: highlight-fade 1.5s ease-out forwards;
+      }
+
+      /* Error Overlay */
+      #error-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #020617;
+        z-index: 9999;
+        color: #f43f5e;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: monospace;
+        text-align: center;
+        padding: 2rem;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@0.292.0?external=react,react-dom",
+    "react": "https://esm.sh/react@18.2.0",
+    "react/": "https://esm.sh/react@18.2.0/",
+    "react-dom": "https://esm.sh/react-dom@18.2.0?external=react",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client?external=react",
+    "chart.js": "https://esm.sh/chart.js@4.4.1",
+    "react-chartjs-2": "https://esm.sh/react-chartjs-2@5.2.0?external=react,react-dom,chart.js",
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "three/": "https://esm.sh/three@^0.182.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-slate-950 text-slate-200 antialiased overflow-hidden selection:bg-cyan-500/30 selection:text-cyan-100">
+    <div id="error-overlay">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem;">⚠️ SYSTEM CRITICAL</h1>
+        <p style="font-size: 1.2rem; color: #cbd5e1;">Failed to load core dependencies.</p>
+        <p style="color: #94a3b8; margin-top: 1rem;">This application requires an internet connection to fetch libraries (React, Three.js) from CDNs.</p>
+        <p style="color: #4ade80; margin-top: 2rem;">Offline Fix: Run a local bundler (Vite) or download dependencies locally.</p>
+        <button onclick="window.location.reload()" style="margin-top: 2rem; padding: 10px 20px; background: #334155; color: white; border: 1px solid #475569; cursor: pointer;">RETRY CONNECTION</button>
+    </div>
+    <div id="root"></div>
+    <script>
+      window.onerror = function(msg, url, line) {
+        if (msg.toString().toLowerCase().includes('import') || msg.toString().toLowerCase().includes('module')) {
+           document.getElementById('error-overlay').style.display = 'flex';
+        }
+      };
+      // Fallback for unhandled promise rejections (often from dynamic imports)
+      window.onunhandledrejection = function(event) {
+         if (event.reason && event.reason.toString().includes('Failed to fetch')) {
+             document.getElementById('error-overlay').style.display = 'flex';
+         }
+      };
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

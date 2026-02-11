@@ -1,0 +1,7 @@
+{
+  "name": "HIRAYA Ground Station",
+  "description": "A high-performance telemetry dashboard using the Web Serial API to read COM port data directly in the browser. Features real-time visualization, 3D attitude estimation, and connection management.",
+  "requestFramePermissions": [
+    "serial"
+  ]
+}
